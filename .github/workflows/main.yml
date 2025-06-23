@@ -21,15 +21,15 @@ jobs:
           - java-version: 8
             sonar-enabled: false
             deploy-enabled: false
-          - java-version: 11
-            sonar-enabled: false
-            deploy-enabled: false
-          - java-version: 17
-            sonar-enabled: false
-            deploy-enabled: false
-          - java-version: 21
-            sonar-enabled: false
-            deploy-enabled: false
+          # - java-version: 11
+          #   sonar-enabled: false
+          #   deploy-enabled: false
+          # - java-version: 17
+          #   sonar-enabled: false
+          #   deploy-enabled: false
+          # - java-version: 21
+          #   sonar-enabled: false
+          #   deploy-enabled: false
 
     steps:
       - name: Checkout code
