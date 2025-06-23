@@ -12,7 +12,7 @@ on:
 jobs:
   build:
     name: Test and Build on JDK ${{ matrix.java-version }}
-    runs-on: [self-hosted]
+    runs-on: ubuntu-latest
     timeout-minutes: 25
     strategy:
       fail-fast: false
