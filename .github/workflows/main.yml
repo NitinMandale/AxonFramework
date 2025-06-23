@@ -48,4 +48,4 @@ jobs:
       - name: Regular Build
         if: ${{ !matrix.sonar-enabled }}
         run: |
-          ./mvnw -B -U -Dstyle.color=always -Possrh -Pintegration-test -Djacoco.skip=true -Dsurefire.rerunFailingTestsCount=5 clean verify
+          ./mvnw -B -U -Dstyle.color=always -Pintegration-test -Djacoco.skip=true -Dsurefire.rerunFailingTestsCount=5 clean verify
