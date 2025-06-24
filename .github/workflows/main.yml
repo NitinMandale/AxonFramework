@@ -12,7 +12,7 @@ on:
 jobs:
   build:
     name: Test and Build on JDK ${{ matrix.java-version }}
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted]
     timeout-minutes: 25
     strategy:
       fail-fast: false
@@ -48,4 +48,4 @@ jobs:
       - name: Regular Build
         if: ${{ !matrix.sonar-enabled }}
         run: |
-          ./mvnw -B -U -Dstyle.color=always -DskipTests clean verify
+          ./mvnw -B -U -Dstyle.color=always -Possrh -Pintegration-test -Djacoco.skip=true -Dsurefire.rerunFailingTestsCount=5 clean verify
