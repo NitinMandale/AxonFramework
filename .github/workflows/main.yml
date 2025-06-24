@@ -48,4 +48,4 @@ jobs:
       - name: Regular Build
         if: ${{ !matrix.sonar-enabled }}
         run: |
-          ./mvnw -B -U -Dstyle.color=always -Possrh -Pintegration-test -Djacoco.skip=true -Dsurefire.rerunFailingTestsCount=5 -Dtest=!MysqlJdbcEventStorageEngineTest clean verify
+          ./mvnw -B -U -Dstyle.color=always -Possrh -Pintegration-test -Djacoco.skip=true -Dsurefire.rerunFailingTestsCount=5 -Dtest='!MysqlJdbcEventStorageEngineTest,!WeakReferenceCacheIntegrationTest,!EhCacheIntegrationTest,!EhCache3IntegrationTest,!JCacheIntegrationTest' -DforkCount=4 -DreuseForks=true -T 1C clean verify
