@@ -1,51 +1,47 @@
-name: Axon Framework
+name: Dual Runner Heavy Benchmark
 
 on:
   push:
-    branches:
-      - main
-      - master
-      - axon-*.*.x
-    paths-ignore:
-      - 'docs/**'
+    branches: ["**"]
 
 jobs:
-  build:
-    name: Test and Build on JDK ${{ matrix.java-version }}
-    runs-on: [self-hosted]
-    timeout-minutes: 25
+  benchmark:
+    name: Full Heavy Benchmark on ${{ matrix.runner }}
+    runs-on: ${{ matrix.runner }}
     strategy:
-      fail-fast: false
       matrix:
-        include:
-          - java-version: 8
-            sonar-enabled: false
-            deploy-enabled: false
-          # - java-version: 11
-          #   sonar-enabled: false
-          #   deploy-enabled: false
-          # - java-version: 17
-          #   sonar-enabled: false
-          #   deploy-enabled: false
-          # - java-version: 21
-          #   sonar-enabled: false
-          #   deploy-enabled: false
+        runner:
+          - ubuntu-latest
+          - self-hosted
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK ${{ matrix.java-version }}
-        uses: actions/setup-java@v4.7.1
-        with:
-          distribution: 'zulu'
-          java-version: ${{ matrix.java-version }}
-          cache: "maven"
-          server-id: central
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
-
-      - name: Regular Build
-        if: ${{ !matrix.sonar-enabled }}
+      - name: System Info
         run: |
-          ./mvnw -B -U -Dstyle.color=always -Possrh -Pintegration-test -Djacoco.skip=true -Dsurefire.rerunFailingTestsCount=5 -Dtest='!MysqlJdbcEventStorageEngineTest,!WeakReferenceCacheIntegrationTest,!EhCacheIntegrationTest,!EhCache3IntegrationTest,!JCacheIntegrationTest' -DforkCount=4 -DreuseForks=true -T 1C clean verify
+          echo "Runner: ${{ matrix.runner }}"
+          lscpu
+          echo "vCPUs: $(nproc)"
+          free -h
+          df -h
+
+      - name: Install Tools
+        run: |
+          sudo apt update
+          sudo apt install -y sysbench speedtest-cli
+
+      - name: Heavy CPU Test
+        run: |
+          sysbench cpu --cpu-max-prime=100000 --threads=$(nproc) run
+
+      - name: Heavy RAM Test
+        run: |
+          sysbench memory --memory-total-size=12G --threads=$(nproc) run
+
+      - name: Heavy Disk I/O Test
+        run: |
+          sysbench fileio --file-total-size=5G --file-test-mode=seqrd prepare
+          sysbench fileio --file-total-size=5G --file-test-mode=seqrd --time=30 --threads=$(nproc) --max-requests=0 run
+          sysbench fileio --file-total-size=5G --file-test-mode=seqrd cleanup
+
+      - name: Network Speed Test
+        run: |
+          speedtest-cli --secure --simple
